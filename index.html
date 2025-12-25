@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TGLci Security by Amstrong</title>
+
+<meta name="description" content="Plateforme de vérification et signalement d’arnaques en Côte d’Ivoire.">
+<meta name="robots" content="index, follow">
+
+<style>
+body {
+    margin: 0;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #0b7a43;
+    color: #333;
+}
+
+header {
+    background: linear-gradient(135deg, #0f9d58, #0b7a43);
+    color: #fff;
+    padding: 25px 15px;
+    text-align: center;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 28px;
+}
+
+header p {
+    margin-top: 8px;
+    font-size: 14px;
+    opacity: 0.9;
+}
+
+.stats {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    background: #ffffff;
+    margin: 20px auto;
+    max-width: 800px;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+}
+
+.stat {
+    padding: 15px;
+    text-align: center;
+    flex: 1;
+}
+
+.stat h2 {
+    margin: 0;
+    color: #0f9d58;
+}
+
+.container {
+    max-width: 700px;
+    margin: 20px auto;
+    background: #ffffff;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+}
+
+textarea {
+    width: 100%;
+    height: 120px;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+    resize: none;
+}
+
+button {
+    width: 100%;
+    margin-top: 15px;
+    padding: 12px;
+    font-size: 16px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    background: #0f9d58;
+    color: #fff;
+    transition: transform 0.2s, background 0.2s;
+}
+
+button:hover {
+    background: #0b7a43;
+    transform: scale(1.02);
+}
+
+.result {
+    margin-top: 20px;
+    padding: 15px;
+    border-radius: 8px;
+    display: none;
+}
+
+.safe { background: #e6f9f0; color: #0f9d58; }
+.warning { background: #fff4e5; color: #d97706; }
+.danger { background: #fdecea; color: #d93025; }
+
+.actions {
+    display: none;
+    margin-top: 15px;
+    gap: 10px;
+}
+
+.actions button {
+    width: 50%;
+    font-size: 14px;
+}
+
+.map {
+    margin-top: 30px;
+    padding: 20px;
+    background: #f4f4f4;
+    border-radius: 10px;
+    text-align: center;
+}
+
+footer {
+    margin: 30px 10px;
+    text-align: center;
+    color: #fff;
+    font-size: 13px;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1>🛡️ TGLci Security</h1>
+    <p>by Amstrong • Vérification & signalement des arnaques</p>
+</header>
+
+<div class="stats">
+    <div class="stat">
+        <h2 id="totalChecks">0</h2>
+        <p>Analyses</p>
+    </div>
+    <div class="stat">
+        <h2 id="totalScams">0</h2>
+        <p>Arnaques détectées</p>
+    </div>
+    <div class="stat">
+        <h2 id="totalReports">0</h2>
+        <p>Signalements</p>
+    </div>
+</div>
+
+<div class="container">
+    <h3>🔍 Vérifier un message, lien ou numéro</h3>
+    <textarea id="inputText" placeholder="Collez ici le message, le lien ou le numéro suspect..."></textarea>
+    <button onclick="analyser()">Vérifier</button>
+
+    <div id="result" class="result"></div>
+
+    <div class="actions" id="actions">
+        <button onclick="signaler()">🚨 Signaler</button>
+        <button onclick="partagerWhatsApp()">📤 Partager</button>
+    </div>
+
+    <div class="map">
+        <h4>📍 Zones les plus signalées (simulation)</h4>
+        <p>Abidjan • Bouaké • Yamoussoukro • San Pedro</p>
+        <small>Carte interactive disponible prochainement</small>
+    </div>
+</div>
+
+<footer>
+    © 2025 TGLci Security by Amstrong • Prévention & Sécurité Numérique
+</footer>
+
+<script>
+let checks = Number(localStorage.getItem("checks")) || 0;
+let scams = Number(localStorage.getItem("scams")) || 0;
+let reports = Number(localStorage.getItem("reports")) || 0;
+
+updateStats();
+
+function analyser() {
+    const text = document.getElementById("inputText").value.toLowerCase();
+    if (!text.trim()) {
+        alert("Veuillez entrer un contenu.");
+        return;
+    }
+
+    checks++;
+    localStorage.setItem("checks", checks);
+
+    let score = 0;
+    let raisons = [];
+
+    const mots = ["gagné", "cadeau", "urgence", "envoyer", "argent", "paiement", "compte", "otp", "lotterie"];
+    mots.forEach(m => {
+        if (text.includes(m)) {
+            score++;
+            raisons.push(m);
+        }
+    });
+
+    if (text.includes("http") || text.includes("bit.ly") || text.includes("tinyurl")) {
+        score++;
+        raisons.push("lien suspect");
+    }
+
+    const result = document.getElementById("result");
+    const actions = document.getElementById("actions");
+    result.style.display = "block";
+    actions.style.display = "flex";
+
+    if (score <= 1) {
+        result.className = "result safe";
+        result.innerHTML = "✅ <strong>Semble sûr</strong><br>Restez vigilant.";
+    } else if (score <= 3) {
+        result.className = "result warning";
+        result.innerHTML = "⚠️ <strong>Suspect</strong><br>Mots détectés : " + raisons.join(", ");
+    } else {
+        result.className = "result danger";
+        result.innerHTML = "❌ <strong>Arnaque probable</strong><br>Signes : " + raisons.join(", ");
+        scams++;
+        localStorage.setItem("scams", scams);
+    }
+
+    updateStats();
+}
+
+function signaler() {
+    reports++;
+    localStorage.setItem("reports", reports);
+    alert("Merci ! Arnaque signalée.");
+    updateStats();
+}
+
+function partagerWhatsApp() {
+    const txt = document.getElementById("result").innerText;
+    window.open("https://wa.me/?text=" + encodeURIComponent("🛡️ TGLci Security by Amstrong\n\n" + txt));
+}
+
+function updateStats() {
+    document.getElementById("totalChecks").innerText = checks;
+    document.getElementById("totalScams").innerText = scams;
+    document.getElementById("totalReports").innerText = reports;
+}
+</script>
+
+</body>
+</html>
